@@ -5,8 +5,8 @@ import DetailedReport from "./DetailedReport";
 const Main = () => {
   return (
     <div className="container-main">
-      <Overview />
-      <DetailedReport />
+      {/* <Overview /> */}
+      {/* <DetailedReport /> */}
     </div>
   );
 };
