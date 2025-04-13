@@ -1,0 +1,43 @@
+.container-nav {
+  padding: 20px;
+}
+.menu {
+  padding-left: 0;
+  li {
+    list-style: none;
+    padding: 10px;
+    border-radius: 10px;
+    a {
+      margin-left: 5px;
+      text-decoration: none;
+      color: black;
+    }
+  }
+  li:hover {
+    background-color: rgb(238, 97, 121);
+    color: white;
+  }
+}
+
+.ad {
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(207, 218, 240);
+  padding: 20px;
+  border-radius: 10px;
+  button {
+    width: 150px;
+    border-color: rgb(52, 103, 245);
+    background-color: white;
+    border-radius: 5px;
+    color: rgb(52, 103, 245);
+    padding: 4px;
+  }
+  button:hover {
+    background-color: rgb(192, 206, 246);
+    color: white;
+  }
+}
