@@ -1,32 +1,33 @@
-import React, { useState, useEffect } from "react"; // Import useState and useEffect
+import React, { useState, useEffect } from "react";
 import "../css/DetailedReport.css";
-import { CiImport } from "react-icons/ci";
-import { CiExport } from "react-icons/ci";
+import { CiImport, CiExport } from "react-icons/ci";
 import { GoPencil } from "react-icons/go";
-import { PiLessThan } from "react-icons/pi";
-import { PiGreaterThan } from "react-icons/pi";
+import { PiLessThan, PiGreaterThan } from "react-icons/pi";
 import { FaRegUserCircle } from "react-icons/fa";
+import EditModal from "./EditModal";
 
 const DetailedReport = () => {
-  // State for users
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [formMode, setFormMode] = useState("add");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch data when component mounts
+  // Đưa fetchData ra ngoài để dùng lại
+  const fetchData = async () => {
+    try {
+      const res = await fetch(
+        "https://67cd3719dd7651e464edabb9.mockapi.io/users"
+      );
+      const data = await res.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(
-          "https://67c824890acf98d0708518a5.mockapi.io/users"
-        );
-        const data = await res.json();
-        setUsers(data); // Set users state with the fetched data
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
-  }, []); // Empty dependency array means this runs only once when the component mounts
+  }, []);
 
   const getStatusBadge = (status) => {
     let className = "status-badge ";
@@ -46,15 +47,40 @@ const DetailedReport = () => {
     return <span className={className}>{status}</span>;
   };
 
+  const handleAddUser = () => {
+    setSelectedUser(null);
+    setFormMode("add");
+    setIsModalOpen(true);
+  };
+
+  const handleEditUser = async (user) => {
+    try {
+      const res = await fetch(
+        `https://67cd3719dd7651e464edabb9.mockapi.io/users/${user.id}`
+      );
+      const data = await res.json();
+      setSelectedUser(data);
+      setFormMode("edit");
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="container-detailed-report">
+      {/* Header */}
       <div className="header-detailed-report">
         <div className="logo-detailed-report">
-          <img src="../../img/File text 1.png" alt="" />
+          <img src="../../img/File text 1.png" alt="logo" />
           Detailed Report
         </div>
         <div className="button-ex-im">
-          <button className="button-import">
+          <button className="button-adduser" onClick={handleAddUser}>
             <FaRegUserCircle /> Add user
           </button>
           <button className="button-import">
@@ -65,31 +91,33 @@ const DetailedReport = () => {
           </button>
         </div>
       </div>
+
+      {/* Table */}
       <div className="main-detailed-report">
         <table>
           <thead>
             <tr>
               <th>
-                <input type="checkbox" name="" id="" />
+                <input type="checkbox" />
               </th>
               <th>CUSTOMER NAME</th>
               <th>COMPANY</th>
               <th>ORDER VALUE</th>
               <th>ORDER DATE</th>
               <th style={{ textAlign: "center" }}>STATUS</th>
-              <th></th>
+              <th>ACTION</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user, index) => (
-              <tr key={index}>
+              <tr key={user.id || index}>
                 <td>
-                  <input type="checkbox" name="" id="" />
+                  <input type="checkbox" />
                 </td>
                 <td>
                   <img
                     src="../../img/Avatar 313.png"
-                    alt=""
+                    alt="avatar"
                     style={{
                       borderRadius: "50%",
                       width: "30px",
@@ -100,13 +128,13 @@ const DetailedReport = () => {
                   {user.customerName}
                 </td>
                 <td>{user.company}</td>
-                <td>{user.orderValue}</td>
+                <td>${user.orderValue}</td>
                 <td>{user.orderDate}</td>
                 <td style={{ textAlign: "center" }}>
                   {getStatusBadge(user.status)}
                 </td>
                 <td>
-                  <button>
+                  <button onClick={() => handleEditUser(user)}>
                     <GoPencil />
                   </button>
                 </td>
@@ -115,8 +143,21 @@ const DetailedReport = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Modal */}
+      <EditModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        user={selectedUser}
+        mode={formMode}
+        onSuccess={() => {
+          fetchData(); // Gọi lại sau khi submit thành công
+        }}
+      />
+
+      {/* Pagination Footer */}
       <div className="footer-detailed-report">
-        <p>63 results</p>
+        <p>{users.length} results</p>
         <div className="number-page-navigation">
           <PiLessThan />
           <button>
